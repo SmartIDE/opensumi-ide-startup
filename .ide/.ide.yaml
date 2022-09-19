@@ -1,0 +1,24 @@
+version: smartide/v0.3
+orchestrator:
+  type: allinone
+  version: 3
+workspace:
+  dev-container:
+    service-name: smartide-vscode-node-dev
+
+    ports:
+      tools-webide-vscode: 6800
+      tools-ssh: 6822
+      apps-application: 3001
+    ide-type: vscode
+
+    volumes: 
+      git-config: true
+      ssh-key: true
+    command:      
+      - yarn              # 安装依赖后会自动执行 prepare，编译 Node.js 和 WebWorker 两个插件环境, 下载默认插件
+      - mkdir workspace   # 创建默认的 workspace 目录，启动后会默认打开该目录
+      - yarn start        # 启动前端、后端服务器及 Webview Host
+
+  kube-deploy-files: "vscode-k8s-deployment.yaml" 
+  docker-compose-file: "vscode-docker-compose.yaml"
