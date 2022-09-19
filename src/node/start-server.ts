@@ -5,18 +5,20 @@ import * as koaStatic from 'koa-static';
 import { Deferred } from '@opensumi/ide-core-common';
 import { IServerAppOpts, ServerApp, NodeModule } from '@opensumi/ide-core-node';
 
+// export const DEFAULT_OPENVSX_REGISTRY = 'https://marketplace.smartide.cn'; // China Mirror
+export const DEFAULT_OPENVSX_REGISTRY = 'https://open-vsx.org'; // Official Registry
+
 export async function startServer(arg1: NodeModule[] | Partial<IServerAppOpts>) {
   const app = new Koa();
   const deferred = new Deferred<http.Server>();
+  process.env.EXT_MODE = 'js';
   const port = process.env.IDE_SERVER_PORT || 8000;
   const workspaceDir = process.env.WORKSPACE_DIR || path.join(__dirname, '../../workspace');
   const extensionDir = process.env.EXTENSION_DIR || path.join(__dirname, '../../extensions');
-  const extensionHost = process.env.EXTENSION_HOST_ENTRY || path.join(__dirname, '..', '..', 'hosted/ext.process.js');
+  const extensionHost = process.env.EXTENSION_HOST_ENTRY || 
+  process.env.NODE_ENV === 'production' ? path.join(__dirname, '..', '..', 'hosted/ext.process.js') : path.join(__dirname, '..', '..', 'hosted/ext.process.js');
   let opts: IServerAppOpts = {
     use: app.use.bind(app),
-    marketplace: {
-      endpoint: 'https://open-vsx.org/api',
-    },
     processCloseExitThreshold: 5 * 60 * 1000,
     terminalPtyCloseThreshold: 5 * 60 * 1000,
     staticAllowOrigin: '*',
@@ -27,6 +29,12 @@ export async function startServer(arg1: NodeModule[] | Partial<IServerAppOpts>) 
     ],
     extHost: extensionHost,
   };
+
+  opts.marketplace = {
+    endpoint: DEFAULT_OPENVSX_REGISTRY,
+    showBuiltinExtensions: true,
+  }
+  
   if (Array.isArray(arg1)) {
     opts = {
       ...opts,

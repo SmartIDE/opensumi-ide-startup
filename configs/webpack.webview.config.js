@@ -4,7 +4,7 @@ const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const tsConfigPath = path.join(__dirname, '../tsconfig.json');
-const distDir = path.join(__dirname, '..', 'dist');
+const distDir = path.join(__dirname, '..', 'dist/webview');
 const port = 8899;
 
 module.exports = {
@@ -59,7 +59,7 @@ module.exports = {
     }),
   ],
   devServer: {
-    contentBase: distDir + '/public',
+    contentBase: path.join(__dirname, '../dist'),
     disableHostCheck: true,
     port,
     host: '0.0.0.0',
